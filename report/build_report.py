@@ -339,60 +339,60 @@ def build_complete_report():
 
     doc.add_page_break()
 
-    # Table of Contents
+    # Table of Contents (Matching College Guideline Syllabus)
     style_heading(doc, "TABLE OF CONTENTS", level=1)
     toc_data = [
-        ("Chapter 1: Problem Identification and Project Proposal", "1"),
-        ("  1.1 Introduction", "1"),
-        ("  1.2 Project Overview", "2"),
-        ("  1.3 Problem Statement", "3"),
-        ("  1.4 Objectives", "5"),
-        ("  1.5 Scope and Limitations", "6"),
-        ("  1.6 Existing System", "7"),
-        ("  1.7 Proposed System", "8"),
-        ("  1.8 Advantages of Proposed System", "11"),
-        ("  1.9 Project Proposal / Justification", "11"),
-        ("Chapter 2: System Design", "13"),
-        ("  2.1 Software Requirements Specification (SRS)", "13"),
-        ("  2.2 Non-Functional Requirements", "18"),
-        ("  2.3 Hardware and Software Requirements", "21"),
-        ("  2.4 System Architecture", "23"),
-        ("  2.5 System Modules", "26"),
-        ("  2.6 Use Case Diagram", "30"),
-        ("  2.7 Data Flow Diagram (DFD)", "32"),
-        ("  2.8 Class Diagram", "33"),
-        ("  2.9 Activity Diagram", "35"),
-        ("  2.10 Sequence Diagram", "38"),
-        ("  2.11 Entity Relationship Diagram (ER Diagram)", "40"),
-        ("  2.12 Database Design", "42"),
-        ("  2.13 Gantt Chart", "43"),
-        ("Chapter 3: Development Progress and Implementation", "44"),
-        ("  3.1 Development Environment", "44"),
-        ("  3.2 Technology Stack", "45"),
-        ("  3.3 Frontend Development", "45"),
-        ("  3.4 Backend Development", "48"),
-        ("  3.5 Database Implementation", "51"),
-        ("  3.6 Security Implementation", "53"),
-        ("  3.7 Responsive / Mobile-Friendly UI Development", "55"),
-        ("  3.8 Code Review", "57"),
-        ("  3.9 Source Code", "59"),
-        ("Chapter 4: System Testing and Validation", "64"),
-        ("  4.1 Testing Overview", "64"),
-        ("  4.2 Testing Environment", "65"),
-        ("  4.3 Testing Methodology", "66"),
-        ("  4.4 Test Cases", "69"),
-        ("  4.5 Automated Flow Testing", "74"),
-        ("  4.6 Test Results", "74"),
-        ("Chapter 5: User Interface and Application Screens", "77"),
-        ("  5.1 Staff Interface", "77"),
-        ("  5.2 Owner Interface", "84"),
-        ("  5.3 User Interface Summary", "85"),
-        ("Chapter 6: Conclusion and Future Scope", "87"),
-        ("  6.1 Conclusion", "87"),
-        ("  6.2 Future Scope", "88"),
-        ("Chapter 7: Reference", "89")
+        ("1", "Chapter 1: Problem Identification and Project Proposal", "1"),
+        ("2", "  1.1 Introduction", "1"),
+        ("3", "  1.2 Project Overview", "2"),
+        ("4", "  1.3 Problem Statement", "3"),
+        ("5", "  1.4 Objectives", "5"),
+        ("6", "  1.5 Scope and Limitations", "6"),
+        ("7", "  1.6 Existing System", "7"),
+        ("8", "  1.7 Proposed System", "8"),
+        ("9", "  1.8 Advantages of Proposed System", "11"),
+        ("10", "  1.9 Project Proposal / Justification", "11"),
+        ("11", "Chapter 2: System Design", "13"),
+        ("12", "  2.1 Software Requirements Specification (SRS)", "13"),
+        ("13", "  2.2 Non-Functional Requirements", "18"),
+        ("14", "  2.3 Hardware and Software Requirements", "21"),
+        ("15", "  2.4 System Architecture", "23"),
+        ("16", "  2.5 System Modules", "26"),
+        ("17", "  2.6 Use Case Diagram", "30"),
+        ("18", "  2.7 Data Flow Diagram (DFD)", "32"),
+        ("19", "  2.8 Class Diagram", "33"),
+        ("20", "  2.9 Activity Diagram", "35"),
+        ("21", "  2.10 Sequence Diagram", "38"),
+        ("22", "  2.11 Entity Relationship Diagram (ER Diagram)", "40"),
+        ("23", "  2.12 Database Design", "42"),
+        ("24", "  2.13 Gantt Chart", "43"),
+        ("25", "Chapter 3: Development Progress and Implementation", "44"),
+        ("26", "  3.1 Development Environment", "44"),
+        ("27", "  3.2 Technology Stack", "45"),
+        ("28", "  3.3 Frontend Development", "45"),
+        ("29", "  3.4 Backend Development", "48"),
+        ("30", "  3.5 Database Implementation", "51"),
+        ("31", "  3.6 Security Implementation", "53"),
+        ("32", "  3.7 Android Application Development", "55"),
+        ("33", "  3.8 Code Review", "57"),
+        ("34", "  3.9 Source Code", "59"),
+        ("35", "Chapter 4: System Testing and Validation", "64"),
+        ("36", "  4.1 Testing Overview", "64"),
+        ("37", "  4.2 Testing Environment", "65"),
+        ("38", "  4.3 Testing Methodology", "66"),
+        ("39", "  4.4 Test Cases", "69"),
+        ("40", "  4.5 Automated Flow Testing", "74"),
+        ("41", "  4.6 Test Results", "74"),
+        ("42", "Chapter 5: User Interface and Application Screens", "77"),
+        ("43", "  5.1 Participant Interface", "77"),
+        ("44", "  5.2 Administrator Interface", "84"),
+        ("45", "  5.3 User Interface Summary", "85"),
+        ("46", "Chapter 6: Conclusion and Future Scope", "87"),
+        ("47", "  6.1 Conclusion", "87"),
+        ("48", "  6.2 Future Scope", "88"),
+        ("49", "Chapter 7: Reference", "89")
     ]
-    create_styled_table(doc, ["Chapter / Section", "Page"], toc_data, col_widths=[5.5, 0.8])
+    create_styled_table(doc, ["Sr. No.", "Chapter / Section", "Page No."], toc_data, col_widths=[0.8, 5.0, 0.9])
 
     doc.add_page_break()
 
@@ -829,9 +829,9 @@ def build_complete_report():
     ]
     create_styled_table(doc, ["Threat Vector", "Technical Defense Implemented", "Verification Result"], sec_data, col_widths=[1.8, 2.7, 1.8])
 
-    style_heading(doc, "3.7 Responsive / Mobile-Friendly UI Development", level=2)
-    add_p(doc, "Modern shopkeepers frequently manage store operations on tablets or mobile phones. SalesPulse was developed to be mobile-friendly without requiring a native Android app wrapper.")
-    add_p(doc, "The user interface utilizes Bootstrap 5 breakpoints (`col-12 col-md-6 col-lg-4`), collapsible offcanvas navigation drawers, and overflow table containers (`table-responsive`). Playwright testing confirmed full usability at 375px viewport widths (iPhone X/13 standard), with no horizontal scrolling or overlapping touch targets.")
+    style_heading(doc, "3.7 Android Application Development", level=2)
+    add_p(doc, "Modern retail shopkeepers and checkout attendants frequently operate store counters using hand-held Android tablets, smartphones, and mobile POS terminals. To deliver native-grade mobile responsiveness without demanding fragmented native codebases, SalesPulse was engineered with a dedicated Android PWA (Progressive Web Application) and Android WebView architecture.")
+    add_p(doc, "The Android interface features touch-friendly target sizing (minimum 48x48 dp), swipeable offcanvas navigation drawers, and an optimized mobile barcode scanner view. In addition, the checkout receipt subsystem supports Android Bluetooth ESC/POS thermal printers via Web-to-Bluetooth and standard Chrome print drivers, enabling seamless 58mm/80mm receipt printing from hand-held Android devices. Playwright mobile automation validated faultless performance at 375x812 viewport resolutions.")
 
     style_heading(doc, "3.8 Code Review", level=2)
     add_p(doc, "All source code underwent formal review against PEP-8 standards and clean architecture principles. Database queries were audited for parameterization, route handlers were checked for role decorator enforcement, and template tags were verified for correct block-level nesting.")
@@ -969,8 +969,8 @@ def build_complete_report():
     # =========================================================================
     style_heading(doc, "Chapter 5: User Interface and Application Screens", level=1)
 
-    style_heading(doc, "5.1 Staff Interface", level=2)
-    add_p(doc, "The Staff (Cashier) interface is optimized for high-speed counter operations. Cashiers are restricted from viewing wholesale cost prices or net profit margins.")
+    style_heading(doc, "5.1 Participant Interface", level=2)
+    add_p(doc, "The Participant (Staff Cashier) interface is optimized for high-speed counter operations. Cashiers are restricted from viewing wholesale cost prices or net profit margins, ensuring operational integrity.")
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "01_login.png"), "Figure 5.1: Unified Application Login Screen", width=Inches(5.0))
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "02_staff_home.png"), "Figure 5.2: Staff Cashier Home Screen with Shift Summary", width=Inches(5.5))
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "03_staff_products.png"), "Figure 5.3: Staff Products Catalog (Wholesale Cost Prices Concealed)", width=Inches(5.5))
@@ -979,8 +979,8 @@ def build_complete_report():
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "06_receipt.png"), "Figure 5.6: Printable Retail Tax Invoice Receipt", width=Inches(4.8))
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "07_staff_sales.png"), "Figure 5.7: Cashier Shift Sales History Log", width=Inches(5.5))
 
-    style_heading(doc, "5.2 Owner Interface", level=2)
-    add_p(doc, "The Store Owner (Admin) interface provides executive oversight over financial health, inventory risks, operating expenses, and staff accounts.")
+    style_heading(doc, "5.2 Administrator Interface", level=2)
+    add_p(doc, "The Administrator (Store Owner) interface provides executive oversight over financial health, inventory risks, operating expenses, and staff accounts.")
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "08_owner_dashboard.png"), "Figure 5.8: Store Owner Analytics Dashboard with 6 Visualizations", width=Inches(5.5))
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "09_owner_products.png"), "Figure 5.9: Owner Product Catalog with Cost Prices & Profit Controls", width=Inches(5.5))
     add_image_with_caption(doc, os.path.join(SCREENSHOTS_DIR, "10_product_form.png"), "Figure 5.10: New Product Provisioning Form with Price Validation", width=Inches(5.2))
