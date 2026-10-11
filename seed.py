@@ -201,6 +201,9 @@ def seed_database(config_class=Config):
         # Pre-track inventory decrements
         sold_qty_map = {p["product_id"]: 0 for p in products_list}
 
+        sales_records = []
+        sale_items_records = []
+
         for day_offset in range(90):
             current_day = start_date + timedelta(days=day_offset)
             is_weekend = current_day.weekday() in (5, 6)
@@ -260,50 +263,55 @@ def seed_database(config_class=Config):
                     discount = min(discount, subtotal * 0.2)
                 total_amount = round(subtotal - discount, 2)
 
-                # Insert sale
-                cursor.execute(
-                    """
-                    INSERT INTO sales (invoice_no, sale_date, customer_name, customer_phone,
-                                       subtotal, discount, total_amount, payment_mode, status, user_id)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'COMPLETED', %s)
-                    """,
-                    (inv_no, sale_datetime, cust, phone, subtotal, discount, total_amount, pay_mode, cashier_id)
-                )
-                sale_id = cursor.lastrowid
                 total_sales_count += 1
+                sale_id = total_sales_count
+                sales_records.append((sale_id, inv_no, sale_datetime, cust, phone, subtotal, discount, total_amount, pay_mode, 'COMPLETED', cashier_id))
 
-                # Insert sale items
                 for prod, qty, l_total in lines:
-                    cursor.execute(
-                        """
-                        INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost, line_total)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                        """,
-                        (sale_id, prod["product_id"], qty, prod["sell_price"], prod["cost_price"], l_total)
-                    )
+                    sale_items_records.append((sale_id, prod["product_id"], qty, prod["sell_price"], prod["cost_price"], l_total))
                     total_items_count += 1
+
+        print(f"Bulk inserting {len(sales_records)} sales and {len(sale_items_records)} items...")
+        cursor.executemany(
+            """
+            INSERT INTO sales (sale_id, invoice_no, sale_date, customer_name, customer_phone,
+                               subtotal, discount, total_amount, payment_mode, status, user_id)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            sales_records
+        )
+
+        cursor.executemany(
+            """
+            INSERT INTO sale_items (sale_id, product_id, quantity, unit_price, unit_cost, line_total)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            sale_items_records
+        )
 
         # 6. Reconcile Final Stock and Stock Movements
         print("Reconciling inventory levels and movements...")
+        stock_updates = []
+        stock_movements_records = []
         for p in products_list:
             pid = p["product_id"]
             sold = sold_qty_map[pid]
-            # Ensure target stock is accurate
             if p["sku"] in low_stock_skus:
                 final_stock = low_stock_skus[p["sku"]]
             else:
                 final_stock = max(15, p["stock_qty"] - sold)
 
-            cursor.execute("UPDATE products SET stock_qty = %s WHERE product_id = %s", (final_stock, pid))
+            stock_updates.append((final_stock, pid))
+            stock_movements_records.append((pid, final_stock + sold, owner_id))
 
-            # Initial restock movement
-            cursor.execute(
-                """
-                INSERT INTO stock_movements (product_id, change_qty, reason, user_id, created_at)
-                VALUES (%s, %s, 'RESTOCK', %s, NOW() - INTERVAL 91 DAY)
-                """,
-                (pid, final_stock + sold, owner_id)
-            )
+        cursor.executemany("UPDATE products SET stock_qty = %s WHERE product_id = %s", stock_updates)
+        cursor.executemany(
+            """
+            INSERT INTO stock_movements (product_id, change_qty, reason, user_id, created_at)
+            VALUES (%s, %s, 'RESTOCK', %s, NOW() - INTERVAL 91 DAY)
+            """,
+            stock_movements_records
+        )
 
         # 7. Seed Monthly Overheads (Rent, Electricity, Salaries, Weekly Misc)
         print("Seeding monthly operating expenses...")
