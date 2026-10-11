@@ -19,8 +19,7 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   {% block extra_head %}{% endblock %}
-</head>
-<body class="bg-light">
+<body class="{% block body_class %}bg-light{% endblock %}">
 
 {% if current_user.id %}
   <!-- Mobile Navbar with Hamburger -->
@@ -216,19 +215,20 @@
 
 {% else %}
   <!-- Unauthenticated Views (e.g. Login) -->
-  <main class="min-vh-100 d-flex flex-column">
-    <div class="flash-messages-container container mt-3">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
+  <main class="min-vh-100 position-relative d-flex flex-column">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages-floating" style="position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 1050; width: 90%; max-width: 480px;">
           {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-              {{ message }}
+            <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show shadow-lg border-0 d-flex align-items-center gap-2" role="alert" style="backdrop-filter: blur(12px); border-radius: 12px;">
+              <i class="bi bi-info-circle-fill fs-5"></i>
+              <div class="flex-grow-1 fw-medium">{{ message }}</div>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           {% endfor %}
-        {% endif %}
-      {% endwith %}
-    </div>
+        </div>
+      {% endif %}
+    {% endwith %}
     {% block auth_content %}{% endblock %}
   </main>
 {% endif %}

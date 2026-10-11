@@ -1,64 +1,184 @@
 {% extends "base.html" %}
 
-{% block title %}Login — SalesPulse{% endblock %}
+{% block title %}SalesPulse — Authorized Terminal Access{% endblock %}
+{% block body_class %}auth-body{% endblock %}
 
 {% block auth_content %}
-<div class="d-flex align-items-center justify-content-center flex-grow-1 p-3">
-  <div class="card shadow-lg border-0" style="max-width: 440px; width: 100%; border-radius: 16px;">
-    <div class="card-body p-4 p-md-5">
-      
-      <!-- Brand Logo / Header -->
-      <div class="text-center mb-4">
-        <div class="d-inline-flex align-items-center justify-content-center bg-brand text-white rounded-circle mb-3 shadow" style="width: 58px; height: 58px;">
-          <i class="bi bi-graph-up-arrow fs-4 text-warning"></i>
+<div class="auth-canvas">
+  <!-- Glowing ambient lights -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="container py-4 py-lg-5 position-relative" style="z-index: 10;">
+    <div class="row align-items-center justify-content-center g-4 g-xl-5">
+
+      <!-- Left Hero & Analytics Showcase (Visible on lg and above) -->
+      <div class="col-lg-6 col-xl-7 d-none d-lg-block text-white pe-xl-4">
+        <!-- Live Engine Badge -->
+        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4" 
+             style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em;">
+          <span class="live-pulse-dot"></span>
+          SALESPULSE ENGINE &bull; ACTIVE
         </div>
-        <h3 class="fw-bold text-dark m-0">SalesPulse</h3>
-        <p class="text-muted small mt-1">Small Business Sales & Inventory Analytics</p>
+
+        <!-- High-Impact Headline -->
+        <h1 class="display-5 fw-bold mb-3" style="letter-spacing: -0.03em; line-height: 1.15;">
+          Retail Sales &amp;<br>
+          <span style="background: linear-gradient(135deg, #2dd4bf 0%, #38bdf8 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Inventory Pulse.
+          </span>
+        </h1>
+
+        <p class="lead text-light text-opacity-75 mb-4" style="font-size: 1.05rem; line-height: 1.65; max-width: 540px;">
+          Next-generation commercial analytics platform engineered for retail store operators. Real-time profit tracking, dynamic inventory forecasting, and frictionless POS checkout.
+        </p>
+
+        <!-- Feature Showcase Glass Cards -->
+        <div class="d-flex flex-column gap-3 mb-4" style="max-width: 520px;">
+          <div class="auth-feature-pill d-flex align-items-center gap-3">
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="background: rgba(15, 118, 110, 0.35); width: 44px; height: 44px;">
+              <i class="bi bi-graph-up-arrow fs-5 text-teal"></i>
+            </div>
+            <div>
+              <div class="fw-semibold text-white small">Point-in-Time Margin Auditing</div>
+              <div class="text-white-50 small">Accurate profit calculations protected by historical cost snapshotting.</div>
+            </div>
+          </div>
+
+          <div class="auth-feature-pill d-flex align-items-center gap-3">
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="background: rgba(2, 132, 199, 0.35); width: 44px; height: 44px;">
+              <i class="bi bi-shield-check fs-5 text-info"></i>
+            </div>
+            <div>
+              <div class="fw-semibold text-white small">Automated Inventory Guardian</div>
+              <div class="text-white-50 small">Threshold-triggered restock notices and 30-day dead stock elimination.</div>
+            </div>
+          </div>
+
+          <div class="auth-feature-pill d-flex align-items-center gap-3">
+            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.3); width: 44px; height: 44px;">
+              <i class="bi bi-lightning-charge-fill fs-5 text-warning"></i>
+            </div>
+            <div>
+              <div class="fw-semibold text-white small">High-Velocity POS Terminal</div>
+              <div class="text-white-50 small">Instant debounced SKU search, thermal invoice receipts, and multi-line billing.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric Trust Bar -->
+        <div class="d-flex align-items-center gap-3 text-white-50 small pt-2">
+          <span><i class="bi bi-check2-circle text-teal me-1"></i> 2,600+ Sales Seeded</span>
+          <span>&bull;</span>
+          <span><i class="bi bi-cpu text-info me-1"></i> Row-Locked ACID Safety</span>
+          <span>&bull;</span>
+          <span><i class="bi bi-lock text-warning me-1"></i> CSRF &amp; RBAC Guarded</span>
+        </div>
       </div>
 
-      <!-- Login Form -->
-      <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- Right Login Card -->
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="auth-glass-card p-4 p-sm-5">
 
-        <div class="mb-3">
-          <label for="email" class="form-label small fw-semibold text-secondary">Email Address</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-envelope"></i></span>
-            <input type="email" class="form-control border-start-0" id="email" name="email" value="{{ email or '' }}" placeholder="e.g. owner@salespulse.com" required autofocus>
+          <!-- Brand Header -->
+          <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-4 mb-3 shadow" 
+                 style="width: 62px; height: 62px; background: linear-gradient(135deg, #0f766e 0%, #0284c7 100%);">
+              <i class="bi bi-graph-up-arrow fs-3 text-white"></i>
+            </div>
+            <h3 class="fw-bold text-white mb-1 tracking-tight">SalesPulse</h3>
+            <p class="text-white-50 small mb-0">Authorized Terminal Authentication</p>
           </div>
-        </div>
 
-        <div class="mb-4">
-          <label for="password" class="form-label small fw-semibold text-secondary">Password</label>
-          <div class="input-group">
-            <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-lock"></i></span>
-            <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="••••••••" required>
+          <!-- Quick Fill Switcher (Discreet & Professional) -->
+          <div class="mb-4 pb-3 border-bottom border-white border-opacity-10 text-center">
+            <span class="text-white-50 small d-block mb-2" style="font-size: 0.78rem;">Quick Test Profiles:</span>
+            <div class="d-flex justify-content-center gap-2">
+              <button type="button" class="quick-role-pill" onclick="quickFill('owner')">
+                <i class="bi bi-shield-lock-fill text-warning"></i> Store Owner
+              </button>
+              <button type="button" class="quick-role-pill" onclick="quickFill('staff')">
+                <i class="bi bi-person-badge-fill text-info"></i> POS Cashier
+              </button>
+            </div>
           </div>
-        </div>
 
-        <button type="submit" class="btn btn-teal text-white w-100 py-2 fw-semibold shadow-sm" style="background-color: #0F766E;">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-        </button>
-      </form>
+          <!-- Login Form -->
+          <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-      <!-- Demo Credentials Guide -->
-      <div class="mt-4 pt-3 border-top text-center">
-        <span class="badge bg-light text-muted border mb-2">Demo Credentials</span>
-        <div class="small text-secondary d-flex justify-content-around">
-          <div>
-            <strong>Owner:</strong><br>
-            <code>owner@salespulse.com</code><br>
-            <code>Owner@123</code>
-          </div>
-          <div class="border-start ps-3">
-            <strong>Staff:</strong><br>
-            <code>staff@salespulse.com</code><br>
-            <code>Staff@123</code>
-          </div>
+            <!-- Email Address Field -->
+            <div class="mb-3">
+              <label for="email" class="form-label small fw-semibold text-white-50 mb-1">Email Address</label>
+              <div class="input-group auth-input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" 
+                       value="{{ email or '' }}" placeholder="name@salespulse.com" required autofocus autocomplete="username">
+              </div>
+            </div>
+
+            <!-- Password Field with Show/Hide Toggle -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="password" class="form-label small fw-semibold text-white-50 m-0">Password</label>
+              </div>
+              <div class="input-group auth-input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password" 
+                       placeholder="••••••••••••" required autocomplete="current-password">
+                <button class="btn btn-password-toggle" type="button" id="togglePasswordBtn" title="Toggle visibility">
+                  <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-auth-gradient w-100 mb-3 d-flex align-items-center justify-content-center gap-2">
+              <span>Sign In to Terminal</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+
+            <!-- Security Badge Footer -->
+            <div class="text-center pt-2 text-white-50" style="font-size: 0.78rem;">
+              <i class="bi bi-shield-check text-teal me-1"></i> 256-Bit SSL Encrypted Session &bull; Role Verified
+            </div>
+          </form>
+
         </div>
       </div>
 
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Toggle Password Visibility
+const toggleBtn = document.getElementById('togglePasswordBtn');
+const passwordInput = document.getElementById('password');
+const toggleIcon = document.getElementById('togglePasswordIcon');
+
+if (toggleBtn && passwordInput && toggleIcon) {
+  toggleBtn.addEventListener('click', function () {
+    const isPassword = passwordInput.getAttribute('type') === 'password';
+    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+    toggleIcon.className = isPassword ? 'bi bi-eye-slash text-teal' : 'bi bi-eye';
+  });
+}
+
+// 1-Click Test Profile Quick-Fill
+function quickFill(role) {
+  const emailInput = document.getElementById('email');
+  const passInput = document.getElementById('password');
+  if (role === 'owner') {
+    emailInput.value = 'owner@salespulse.com';
+    passInput.value = 'Owner@123';
+  } else if (role === 'staff') {
+    emailInput.value = 'staff@salespulse.com';
+    passInput.value = 'Staff@123';
+  }
+  passInput.focus();
+}
+</script>
 {% endblock %}
