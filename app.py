@@ -114,5 +114,7 @@ def create_app(config_class=Config):
 
 
 if __name__ == "__main__":
+    import os
+    port = int(os.getenv("PORT", 5001))
     app = create_app()
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=port, debug=True)
