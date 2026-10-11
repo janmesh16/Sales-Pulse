@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ sale.invoice_no }} — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center">
+
+  <!-- Action Bar (Hidden on print) -->
+  <div class="d-flex justify-content-between align-items-center w-100 mb-3 no-print" style="max-width: 580px;">
+    <a href="{{ url_for('sales.new_sale') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-cart-plus me-1"></i> New Sale
+    </a>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('sales.list_sales') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-list-ul me-1"></i> All Sales
+      </a>
+      <button type="button" class="btn btn-teal text-white btn-sm fw-semibold" style="background-color: #0F766E;" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> Print Receipt
+      </button>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Card -->
+  <div class="card shadow border p-4 receipt-container bg-white text-dark w-100" style="max-width: 580px; font-size: 0.92rem;">
+    
+    <!-- Store Header -->
+    <div class="text-center border-bottom pb-3 mb-3">
+      <h4 class="fw-bold m-0 tracking-tight text-dark">{{ settings.shop_name or 'SalesPulse Retail' }}</h4>
+      <div class="small text-muted mt-1">{{ settings.shop_address or 'Main Market, City Center' }}</div>
+      {% if settings.gstin %}
+        <div class="small text-muted"><strong>GSTIN:</strong> {{ settings.gstin }}</div>
+      {% endif %}
+      <div class="badge bg-light text-secondary border mt-2">RETAIL TAX INVOICE</div>
+      {% if sale.status == 'CANCELLED' %}
+        <div class="badge bg-danger text-white mt-1 d-block">CANCELLED INVOICE</div>
+      {% endif %}
+    </div>
+
+    <!-- Invoice Details Meta -->
+    <div class="row g-2 mb-3 small">
+      <div class="col-6">
+        <div><strong>Invoice No:</strong> <span class="font-monospace fw-bold">{{ sale.invoice_no }}</span></div>
+        <div><strong>Date:</strong> {{ sale.sale_date | datetime }}</div>
+        <div><strong>Cashier:</strong> {{ sale.cashier_name }}</div>
+      </div>
+      <div class="col-6 text-end">
+        <div><strong>Customer:</strong> {{ sale.customer_name or 'Walk-in' }}</div>
+        {% if sale.customer_phone %}
+        <div><strong>Mobile:</strong> {{ sale.customer_phone }}</div>
+        {% endif %}
+        <div><strong>Payment:</strong> <span class="badge bg-secondary-subtle text-secondary">{{ sale.payment_mode }}</span></div>
+      </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <div class="table-responsive mb-3">
+      <table class="table table-sm border-bottom align-middle m-0" style="font-size: 0.85rem;">
+        <thead class="table-light">
+          <tr>
+            <th>Item</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in sale.items %}
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ item.product_name }}</div>
+              <div class="text-muted small" style="font-size: 0.75rem;">{{ item.sku }}</div>
+            </td>
+            <td class="text-end">₹ {{ "%.2f"|format(item.unit_price) }}</td>
+            <td class="text-center">{{ item.quantity }}</td>
+            <td class="text-end fw-semibold">₹ {{ "%.2f"|format(item.line_total) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals Calculation Summary -->
+    <div class="d-flex flex-column gap-1 small border-bottom pb-3 mb-3">
+      <div class="d-flex justify-content-between text-muted">
+        <span>Subtotal:</span>
+        <span>₹ {{ "%.2f"|format(sale.subtotal) }}</span>
+      </div>
+      {% if sale.discount > 0 %}
+      <div class="d-flex justify-content-between text-success">
+        <span>Discount:</span>
+        <span>- ₹ {{ "%.2f"|format(sale.discount) }}</span>
+      </div>
+      {% endif %}
+      <div class="d-flex justify-content-between fs-5 fw-bold text-dark pt-1 border-top">
+        <span>Total Amount:</span>
+        <span class="text-teal">₹ {{ "%.2f"|format(sale.total_amount) }}</span>
+      </div>
+    </div>
+
+    <!-- Invoice Footer / Terms -->
+    <div class="text-center small text-muted">
+      <div>Thank you for your visit! Goods once sold cannot be returned without receipt.</div>
+      <div class="mt-1" style="font-size: 0.75rem;">Powered by <strong>SalesPulse</strong> Business System</div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

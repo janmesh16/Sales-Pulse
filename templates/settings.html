@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Settings & Store Profile — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  {% if is_owner %}
+  <!-- Store Profile Settings (Owner Only) -->
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white">
+        <span class="fw-bold text-dark"><i class="bi bi-shop me-2 text-teal"></i> Store Details & Invoice Configuration</span>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="update_profile">
+
+          <div class="mb-3">
+            <label for="shop_name" class="form-label small fw-semibold text-secondary">Shop / Store Name *</label>
+            <input type="text" class="form-control" id="shop_name" name="shop_name" value="{{ settings.shop_name or 'SalesPulse Retail' }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="shop_address" class="form-label small fw-semibold text-secondary">Store Address (printed on receipts)</label>
+            <textarea class="form-control" id="shop_address" name="shop_address" rows="2">{{ settings.shop_address or 'Shop No. 12, Main Bazaar, City - 400001' }}</textarea>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label for="gstin" class="form-label small fw-semibold text-secondary">GSTIN Number</label>
+              <input type="text" class="form-control text-uppercase" id="gstin" name="gstin" value="{{ settings.gstin or '27ABCDE1234F1Z5' }}" placeholder="27XXXXX0000X1ZX">
+            </div>
+            <div class="col-6">
+              <label for="currency" class="form-label small fw-semibold text-secondary">Currency Symbol</label>
+              <input type="text" class="form-control" id="currency" name="currency" value="{{ settings.currency or '₹' }}">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="default_reorder_level" class="form-label small fw-semibold text-secondary">Default Low-Stock Alert Threshold</label>
+            <input type="number" class="form-control" id="default_reorder_level" name="default_reorder_level" value="{{ settings.default_reorder_level or 5 }}" min="1">
+          </div>
+
+          <button type="submit" class="btn btn-teal text-white fw-semibold" style="background-color: #0F766E;">
+            <i class="bi bi-check2-circle me-1"></i> Save Store Settings
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Change Account Password (All Users) -->
+  <div class="col-12 {% if is_owner %}col-lg-5{% else %}col-lg-6 mx-auto{% endif %}">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white">
+        <span class="fw-bold text-dark"><i class="bi bi-shield-lock me-2 text-teal"></i> Change Account Password</span>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="action" value="change_password">
+
+          <div class="mb-3">
+            <label for="current_password" class="form-label small fw-semibold text-secondary">Current Password *</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="new_password" class="form-label small fw-semibold text-secondary">New Password *</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Minimum 6 characters" required>
+          </div>
+
+          <div class="mb-4">
+            <label for="confirm_password" class="form-label small fw-semibold text-secondary">Confirm New Password *</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+          </div>
+
+          <button type="submit" class="btn btn-secondary text-white fw-semibold w-100">
+            <i class="bi bi-key me-1"></i> Update Password
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

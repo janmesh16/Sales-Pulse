@@ -1,0 +1,21 @@
+sequenceDiagram
+  actor U as User (Owner / Staff)
+  participant B as Browser Client
+  participant A as Flask Auth Blueprint
+  participant DB as MySQL Database
+
+  U->>B: Enter email, password & click Sign In
+  B->>A: POST /login (email, password, csrf_token)
+  A->>A: Check rate limit in memory
+  A->>DB: SELECT user_id, password_hash, role, is_active FROM users WHERE email=?
+  DB-->>A: User record
+  A->>A: check_password_hash(hash, password)
+  alt Valid Credentials & is_active = 1
+    A->>A: session.clear(); session['user_id'] = id; session['role'] = role
+    A-->>B: 302 Redirect to /dashboard or /home
+    B-->>U: Render Role Home Page
+  else Invalid Credentials
+    A->>A: increment failed attempts
+    A-->>B: 200 Render login.html with error flash
+    B-->>U: Show error notification
+  end

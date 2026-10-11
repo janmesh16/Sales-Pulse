@@ -1,0 +1,15 @@
+flowchart TD
+  A([Start: Open /login]) --> B[Enter Email & Password]
+  B --> C[Submit Form]
+  C --> D{Check Rate Limit: 5 failures?}
+  D -- Yes --> E[Lock for 5 minutes, Display Error] --> B
+  D -- No --> F{Validate in DB: user exists & password hash matches?}
+  F -- No --> G[Increment Failed Attempts, Display Error] --> B
+  F -- Yes --> H{Is Account Active?}
+  H -- No --> I[Display Deactivation Notice] --> B
+  H -- Yes --> J[Clear Failed Attempts & Regenerate Session]
+  J --> K{Check Role}
+  K -- OWNER --> L[Redirect to /dashboard]
+  K -- STAFF --> M[Redirect to /home]
+  L --> Z([End])
+  M --> Z

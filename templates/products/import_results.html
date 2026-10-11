@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Import Results — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold m-0 text-dark">CSV Import Report</h3>
+        <p class="text-muted small m-0 mt-1">Summary of processed rows and error diagnostics.</p>
+      </div>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-teal text-white btn-sm" style="background-color: #0F766E;">
+        <i class="bi bi-arrow-right me-1"></i> Go to Products
+      </a>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="row g-3 mb-4">
+      <div class="col-6">
+        <div class="card p-3 border-start border-4 border-success">
+          <div class="small text-muted text-uppercase fw-semibold">Successfully Added</div>
+          <div class="fs-3 fw-bold text-success">{{ result.added_count }}</div>
+          <div class="small text-muted">out of {{ result.total_rows }} total rows</div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card p-3 border-start border-4 border-danger">
+          <div class="small text-muted text-uppercase fw-semibold">Failed Rows</div>
+          <div class="fs-3 fw-bold text-danger">{{ result.errors|length }}</div>
+          <div class="small text-muted">rows with validation or duplicate errors</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Details Table -->
+    {% if result.errors %}
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-danger-subtle text-danger fw-semibold">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i> Row-by-Row Error Log
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
+          <thead>
+            <tr>
+              <th>Row #</th>
+              <th>SKU</th>
+              <th>Error Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for err in result.errors %}
+            <tr>
+              <td class="fw-bold text-secondary">{{ err.row }}</td>
+              <td><code>{{ err.sku }}</code></td>
+              <td class="text-danger small">{{ err.error }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-success d-flex align-items-center" role="alert">
+      <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+      <div>All rows in the CSV were imported successfully without any errors!</div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

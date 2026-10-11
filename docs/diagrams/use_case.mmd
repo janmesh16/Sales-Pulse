@@ -1,0 +1,34 @@
+flowchart LR
+  Owner((Store Owner)):::actor
+  Staff((Staff Cashier)):::actor
+
+  subgraph SalesPulse["SalesPulse — Small Business Sales Analytics System"]
+    UC1([Login / Logout])
+    UC2([Manage Products & Categories])
+    UC3([Adjust Stock / Bulk CSV Import])
+    UC4([Record POS Sale & Print Receipt])
+    UC5([Cancel Sale & Restore Stock])
+    UC6([Record Store Expenses])
+    UC7([View Analytics Dashboard & Charts])
+    UC8([Generate Daily / Monthly Reports])
+    UC9([Export CSV & PDF])
+    UC10([Manage Staff Accounts])
+    UC11([Monitor Low-Stock & Slow-Movers])
+  end
+
+  Owner --> UC1
+  Owner --> UC2
+  Owner --> UC3
+  Owner --> UC4
+  Owner --> UC5
+  Owner --> UC6
+  Owner --> UC7
+  Owner --> UC8
+  Owner --> UC10
+  Owner --> UC11
+
+  Staff --> UC1
+  Staff --> UC4
+
+  UC8 -.include.-> UC9
+  classDef actor fill:#0F172A,stroke:#0F766E,stroke-width:2px,color:#fff;

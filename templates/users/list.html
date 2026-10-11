@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}User Management — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-3">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">User & Cashier Accounts</h2>
+      <p class="text-muted small m-0 mt-1">Manage staff user logins and control role-based system access.</p>
+    </div>
+    <a href="{{ url_for('users.new_user') }}" class="btn btn-teal text-white fw-semibold shadow-sm" style="background-color: #0F766E;">
+      <i class="bi bi-person-plus me-1"></i> Add Staff Account
+    </a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Full Name</th>
+            <th>Email Address</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td class="text-muted">{{ u.user_id }}</td>
+            <td class="fw-semibold text-dark">{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              {% if u.role == 'OWNER' %}
+                <span class="badge bg-teal-subtle text-teal fw-bold">STORE OWNER</span>
+              {% else %}
+                <span class="badge bg-light text-secondary border fw-bold">STAFF CASHIER</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.is_active %}
+                <span class="badge bg-success-subtle text-success">Active</span>
+              {% else %}
+                <span class="badge bg-danger-subtle text-danger">Deactivated</span>
+              {% endif %}
+            </td>
+            <td class="small text-muted">{{ u.created_at | date }}</td>
+            <td class="text-center">
+              {% if u.role != 'OWNER' %}
+              <form method="POST" action="{{ url_for('users.toggle_user', user_id=u.user_id) }}" onsubmit="return confirm('Toggle active status for this user?');" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                  {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                </button>
+              </form>
+              {% else %}
+                <span class="text-muted small">Protected</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

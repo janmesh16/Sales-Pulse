@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Sales Report — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-3">
+
+  <!-- Header & Navigation Tabs -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">Daily Sales & Profit Report</h2>
+      <p class="text-muted small m-0 mt-1">Detailed accounting breakdown of revenue, COGS, overheads, and net margins.</p>
+    </div>
+    <!-- Export Actions -->
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('reports.daily_report', date=selected_date, export='csv') }}" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+        <i class="bi bi-file-earmark-spreadsheet me-1 text-success"></i> Export CSV
+      </a>
+      <a href="{{ url_for('reports.daily_report', date=selected_date, export='pdf') }}" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+        <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Reports Navigation Bar -->
+  <ul class="nav nav-tabs border-bottom mb-2">
+    <li class="nav-item">
+      <a class="nav-link active fw-semibold text-teal" href="{{ url_for('reports.daily_report') }}"><i class="bi bi-calendar-day me-1"></i> Daily Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.monthly_report') }}"><i class="bi bi-calendar-month me-1"></i> Monthly Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.custom_range_report') }}"><i class="bi bi-calendar-range me-1"></i> Custom Range</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.product_performance') }}"><i class="bi bi-award me-1"></i> Product Performance</a>
+    </li>
+  </ul>
+
+  <!-- Date Selection Filter -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-3">
+      <form method="GET" action="{{ url_for('reports.daily_report') }}" class="row g-2 align-items-center">
+        <div class="col-12 col-md-4 d-flex align-items-center gap-2">
+          <label class="small text-muted fw-semibold text-nowrap">Choose Date:</label>
+          <input type="date" class="form-control form-control-sm" name="date" value="{{ selected_date }}" onchange="this.form.submit()">
+        </div>
+        <div class="col-12 col-md-4">
+          <button type="submit" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i> Load Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Financial KPI Metrics Row -->
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-primary">
+        <div class="stat-label">Total Bills</div>
+        <div class="stat-value text-primary mt-1">{{ report.bills }}</div>
+        <div class="small text-muted">Completed sales</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-teal">
+        <div class="stat-label">Gross Revenue</div>
+        <div class="stat-value mt-1 text-teal">{{ report.revenue | inr }}</div>
+        <div class="small text-muted">Net of discounts</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-secondary">
+        <div class="stat-label">COGS</div>
+        <div class="stat-value text-secondary mt-1">{{ report.cogs | inr }}</div>
+        <div class="small text-muted">Gross Profit: {{ report.gross_profit | inr }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-success">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value mt-1 {% if report.net_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+          {{ report.net_profit | inr }}
+        </div>
+        <div class="small text-muted">Margin: <strong>{{ report.margin_pct }}%</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modes & Itemized Breakdown -->
+  <div class="row g-3">
+    <!-- Payment Mode Breakdown -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white fw-semibold">
+          <i class="bi bi-wallet2 me-1 text-teal"></i> Payment Mode Split
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle m-0">
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th class="text-center">Bills</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pm in report.payment_modes %}
+              <tr>
+                <td><span class="badge bg-secondary-subtle text-secondary">{{ pm.payment_mode }}</span></td>
+                <td class="text-center">{{ pm.count }}</td>
+                <td class="text-end fw-semibold">{{ pm.total | inr }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="3" class="text-center py-3 text-muted">No sales recorded for this date.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Itemized Product Sales -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-white fw-semibold">
+          <i class="bi bi-box-seam me-1 text-teal"></i> Itemized Product Sales
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle m-0">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>SKU</th>
+                <th class="text-center">Qty Sold</th>
+                <th class="text-end">Revenue</th>
+                <th class="text-end">Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for it in report.itemized %}
+              <tr>
+                <td class="fw-semibold text-dark">{{ it.name }}</td>
+                <td><span class="font-monospace small text-secondary">{{ it.sku }}</span></td>
+                <td class="text-center fw-bold">{{ it.qty }}</td>
+                <td class="text-end fw-semibold">{{ it.revenue | inr }}</td>
+                <td class="text-end fw-bold text-success">{{ it.profit | inr }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">No items sold on this date.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

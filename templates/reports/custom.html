@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Custom Date Range Report — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-3">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">Custom Range Sales Analytics</h2>
+      <p class="text-muted small m-0 mt-1">Aggregate business turnover and profitability across custom festival or fiscal date ranges.</p>
+    </div>
+    {% if report %}
+    <a href="{{ url_for('reports.custom_range_report', start_date=start_date, end_date=end_date, export='pdf') }}" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+      <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs border-bottom mb-2">
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.daily_report') }}"><i class="bi bi-calendar-day me-1"></i> Daily Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.monthly_report') }}"><i class="bi bi-calendar-month me-1"></i> Monthly Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active fw-semibold text-teal" href="{{ url_for('reports.custom_range_report') }}"><i class="bi bi-calendar-range me-1"></i> Custom Range</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.product_performance') }}"><i class="bi bi-award me-1"></i> Product Performance</a>
+    </li>
+  </ul>
+
+  <!-- Date Range Selector -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-3">
+      <form method="GET" action="{{ url_for('reports.custom_range_report') }}" class="row g-2 align-items-center">
+        <div class="col-12 col-md-4">
+          <label class="small text-muted fw-semibold">Start Date</label>
+          <input type="date" class="form-control form-control-sm" name="start_date" value="{{ start_date }}" required>
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="small text-muted fw-semibold">End Date</label>
+          <input type="date" class="form-control form-control-sm" name="end_date" value="{{ end_date }}" required>
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-teal text-white btn-sm w-100" style="background-color: #0F766E;">
+            <i class="bi bi-funnel me-1"></i> Generate Range Report
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if report %}
+  <!-- KPI Metrics -->
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-teal">
+        <div class="stat-label">Total Range Revenue</div>
+        <div class="stat-value text-teal mt-1">{{ report.revenue | inr }}</div>
+        <div class="small text-muted">{{ report.bills }} completed bills</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-secondary">
+        <div class="stat-label">Total COGS</div>
+        <div class="stat-value text-secondary mt-1">{{ report.cogs | inr }}</div>
+        <div class="small text-muted">Cost of goods sold</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-danger">
+        <div class="stat-label">Operating Overheads</div>
+        <div class="stat-value text-danger mt-1">{{ report.expenses | inr }}</div>
+        <div class="small text-muted">Recorded store expenses</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-success">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value mt-1 text-success">{{ report.net_profit | inr }}</div>
+        <div class="small text-muted">Net Margin: <strong>{{ report.margin_pct }}%</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Sales in Range -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-semibold">
+      <i class="bi bi-box-seam me-1 text-teal"></i> Product Sales Breakdown ({{ start_date }} to {{ end_date }})
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th class="text-center">Units Sold</th>
+            <th class="text-end">Revenue</th>
+            <th class="text-end">Profit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in report.product_sales %}
+          <tr>
+            <td class="fw-semibold text-dark">{{ it.name }}</td>
+            <td><span class="font-monospace small text-secondary">{{ it.sku }}</span></td>
+            <td class="text-center fw-bold">{{ it.qty }}</td>
+            <td class="text-end fw-semibold text-teal">{{ it.revenue | inr }}</td>
+            <td class="text-end fw-bold text-success">{{ it.profit | inr }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">No sales recorded in this date range.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info border-0 shadow-sm d-flex align-items-center" role="alert">
+    <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+    <div>Please select both Start Date and End Date above to generate a custom range financial report.</div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

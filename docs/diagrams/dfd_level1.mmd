@@ -1,0 +1,15 @@
+flowchart LR
+  O[Store Owner] -->|Product details & CSV| P1((1.0 Manage Products))
+  O -->|Expense records| P3((3.0 Record Expenses))
+  S[Staff / Owner] -->|Cart & Tender| P2((2.0 Process POS Sale))
+  U[User] -->|Credentials| P0((0.0 Authenticate))
+
+  P0 <--> D4[(Users)]
+  P1 <--> D1[(Products & Categories)]
+  P2 --> D2[(Sales & Sale Items)]
+  P2 -->|Decrement stock| D1
+  P2 --> D5[(Stock Movements)]
+  P3 --> D3[(Expenses)]
+
+  D1 & D2 & D3 --> P4((4.0 Analytics & Forecasting))
+  P4 -->|Dashboard KPIs, Charts, Reports| O

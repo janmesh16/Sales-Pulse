@@ -1,0 +1,90 @@
+classDiagram
+  class User {
+    +int user_id
+    +string name
+    +string email
+    +string password_hash
+    +string role
+    +bool is_active
+    +login()
+    +logout()
+  }
+
+  class Category {
+    +int category_id
+    +string name
+  }
+
+  class Product {
+    +int product_id
+    +string sku
+    +string name
+    +float cost_price
+    +float sell_price
+    +int stock_qty
+    +int reorder_level
+    +isLowStock() bool
+    +getMargin() float
+  }
+
+  class Sale {
+    +int sale_id
+    +string invoice_no
+    +datetime sale_date
+    +string customer_name
+    +float subtotal
+    +float discount
+    +float total_amount
+    +string payment_mode
+    +string status
+    +cancel()
+  }
+
+  class SaleItem {
+    +int item_id
+    +int sale_id
+    +int product_id
+    +int quantity
+    +float unit_price
+    +float unit_cost
+    +float line_total
+    +calculateProfit() float
+  }
+
+  class Expense {
+    +int expense_id
+    +date expense_date
+    +string category
+    +float amount
+    +string payment_mode
+    +string note
+  }
+
+  class StockMovement {
+    +int movement_id
+    +int product_id
+    +int change_qty
+    +string reason
+    +datetime created_at
+  }
+
+  class ReportService {
+    +getDailyReport(date)
+    +getMonthlyReport(year, month)
+    +exportCSV()
+    +exportPDF()
+  }
+
+  class ForecastService {
+    +getSalesForecast(lookback, days)
+  }
+
+  User "1" --> "*" Sale : records
+  User "1" --> "*" Expense : logs
+  Category "1" --> "*" Product : classifies
+  Sale "1" *-- "*" SaleItem : contains
+  Product "1" --> "*" SaleItem : sold_as
+  Product "1" --> "*" StockMovement : tracks
+  ReportService ..> Sale : queries
+  ReportService ..> Expense : queries
+  ForecastService ..> Sale : models

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}404 Not Found — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center text-center py-5">
+  <div class="display-1 fw-bold text-secondary">404</div>
+  <h2 class="fw-bold text-dark mt-2">Page Not Found</h2>
+  <p class="text-muted" style="max-width: 480px;">
+    The requested resource, invoice, or endpoint could not be found. It may have been deleted, cancelled, or moved.
+  </p>
+  <a href="{{ url_for('dashboard.owner_dashboard' if is_owner else 'dashboard.staff_home') }}" class="btn btn-teal text-white mt-3" style="background-color: #0F766E;">
+    <i class="bi bi-house me-1"></i> Return to Home
+  </a>
+</div>
+{% endblock %}

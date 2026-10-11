@@ -1,0 +1,13 @@
+flowchart TD
+  A([Start]) --> B[Select Report Type: Daily / Monthly / Custom]
+  B --> C[Select Target Date or Range]
+  C --> D[Submit Form]
+  D --> E[Query COMPLETED sales, sale_items & expenses]
+  E --> F[Calculate Revenue, COGS, Overheads, Net Profit & Margin %]
+  F --> G{Export Requested?}
+  G -- No --> H[Render Interactive HTML Tables & Charts]
+  G -- CSV --> I[Stream RFC-4180 CSV Spreadsheet]
+  G -- PDF --> J[Build Vector PDF Document with ReportLab]
+  H --> Z([End])
+  I --> Z
+  J --> Z

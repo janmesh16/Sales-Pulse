@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit Expense — SalesPulse{% else %}Record Expense — SalesPulse{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold m-0 text-dark">{% if is_edit %}Edit Expense Entry{% else %}Record New Expense{% endif %}</h3>
+        <p class="text-muted small m-0 mt-1">Enter overhead expenditure details for accurate store P&L.</p>
+      </div>
+      <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Expenses
+      </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <!-- Expense Date -->
+          <div class="mb-3">
+            <label for="expense_date" class="form-label small fw-semibold text-secondary">Expense Date *</label>
+            <input type="date" class="form-control" id="expense_date" name="expense_date" value="{{ expense.expense_date or '' }}" required>
+          </div>
+
+          <!-- Category -->
+          <div class="mb-3">
+            <label for="category" class="form-label small fw-semibold text-secondary">Expense Category *</label>
+            <select class="form-select" id="category" name="category" required>
+              <option value="">Select Category</option>
+              {% for cat in categories %}
+                <option value="{{ cat }}" {% if expense.category == cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Amount -->
+          <div class="mb-3">
+            <label for="amount" class="form-label small fw-semibold text-secondary">Amount (₹) *</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">₹</span>
+              <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ expense.amount or '' }}" placeholder="0.00" min="0.01" required>
+            </div>
+          </div>
+
+          <!-- Payment Mode -->
+          <div class="mb-3">
+            <label for="payment_mode" class="form-label small fw-semibold text-secondary">Payment Mode *</label>
+            <select class="form-select" id="payment_mode" name="payment_mode" required>
+              {% for mode in payment_modes %}
+                <option value="{{ mode }}" {% if expense.payment_mode == mode %}selected{% endif %}>{{ mode }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Note / Description -->
+          <div class="mb-4">
+            <label for="note" class="form-label small fw-semibold text-secondary">Note / Description (Optional)</label>
+            <input type="text" class="form-control" id="note" name="note" value="{{ expense.note or '' }}" placeholder="e.g. Monthly shop rent paid to landlord">
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-teal text-white fw-semibold" style="background-color: #0F766E;">
+              <i class="bi bi-check-lg me-1"></i> {% if is_edit %}Update Expense{% else %}Record Expense{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

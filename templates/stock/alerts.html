@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Alerts — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">Inventory Risk Alerts</h2>
+      <p class="text-muted small m-0 mt-1">Identifies products vulnerable to stock-out or capital blockage (dead stock).</p>
+    </div>
+    <a href="{{ url_for('stock.stock_overview') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Stock Overview
+    </a>
+  </div>
+
+  <!-- SECTION 1: Low Stock & Out of Stock Alerts -->
+  <div class="card shadow-sm border-0 border-top border-4 border-warning">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <span class="fw-bold text-dark"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> Low Stock & Depletion Warnings</span>
+      <span class="badge bg-warning-subtle text-warning-emphasis">{{ low_stock|length }} Products</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th class="text-center">Current Stock</th>
+            <th class="text-center">Reorder Threshold</th>
+            <th>Status</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if low_stock %}
+            {% for p in low_stock %}
+            <tr>
+              <td><span class="font-monospace text-secondary fw-semibold">{{ p.sku }}</span></td>
+              <td><span class="fw-semibold text-dark">{{ p.name }}</span></td>
+              <td><span class="badge bg-light text-dark border">{{ p.category_name }}</span></td>
+              <td class="text-center fw-bold fs-6 {% if p.stock_qty <= 0 %}text-danger{% else %}text-warning{% endif %}">
+                {{ p.stock_qty }}
+              </td>
+              <td class="text-center text-muted">{{ p.reorder_level }}</td>
+              <td>
+                {% if p.stock_qty <= 0 %}
+                  <span class="badge bg-danger-subtle text-danger">Out of Stock</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning-emphasis">Reorder Required</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{{ url_for('stock.stock_overview') }}" class="btn btn-sm btn-outline-teal">
+                  <i class="bi bi-plus-circle me-1"></i> Restock
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-check-circle fs-3 text-success d-block mb-1"></i>
+                All active products are currently well-stocked above their reorder thresholds!
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2: Slow-Moving & Dead Stock Alerts -->
+  <div class="card shadow-sm border-0 border-top border-4 border-secondary">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <div>
+        <span class="fw-bold text-dark"><i class="bi bi-hourglass-bottom me-2 text-secondary"></i> Slow-Moving Products (No Sales in Last 30 Days)</span>
+        <div class="small text-muted">These items tie up working capital without generating turnover.</div>
+      </div>
+      <span class="badge bg-secondary-subtle text-secondary">{{ slow_moving|length }} Items</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th class="text-end">Selling Price</th>
+            <th class="text-center">Tied Up Stock</th>
+            <th>Last Sold Date</th>
+            <th class="text-end">Tied Capital</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if slow_moving %}
+            {% for p in slow_moving %}
+            <tr>
+              <td><span class="font-monospace text-secondary fw-semibold">{{ p.sku }}</span></td>
+              <td><span class="fw-semibold text-dark">{{ p.name }}</span></td>
+              <td><span class="badge bg-light text-dark border">{{ p.category_name }}</span></td>
+              <td class="text-end fw-semibold">{{ p.sell_price | inr }}</td>
+              <td class="text-center">{{ p.stock_qty }} units</td>
+              <td class="small text-muted">{{ p.last_sold_date | date if p.last_sold_date else 'Never Sold' }}</td>
+              <td class="text-end fw-bold text-muted">{{ (p.stock_qty * p.cost_price) | inr }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-lightning-charge fs-3 text-success d-block mb-1"></i>
+                Great inventory turnover! Every product has sold within the last 30 days.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

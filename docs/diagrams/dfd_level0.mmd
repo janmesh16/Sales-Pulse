@@ -1,0 +1,6 @@
+flowchart LR
+  O[Store Owner] -->|Product Catalog, Overhead Expenses, Settings| S((SalesPulse System))
+  C[Staff Cashier] -->|Cart Items, Payment Modes, Customer Info| S
+  S -->|Bills, Invoices, Receipts| CU[Retail Customer]
+  S -->|Analytics KPIs, Profit Margins, Stock Alerts, PDF/CSV Reports| O
+  S -->|Shift Summary, Sales Receipts| C

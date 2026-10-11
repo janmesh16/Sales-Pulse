@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Cashier Terminal — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-4">
+
+  <!-- Welcome Banner -->
+  <div class="card bg-brand text-white border-0 shadow-sm p-4 rounded-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <span class="badge bg-white text-brand fw-semibold mb-2">Cashier Shift Active</span>
+        <h2 class="fw-bold m-0 text-white">Welcome, {{ current_user.name }}!</h2>
+        <p class="text-white-50 small mt-1 mb-0">Record customer sales quickly and print GST / regular tax invoices.</p>
+      </div>
+      <div>
+        <a href="{{ url_for('sales.new_sale') }}" class="btn btn-warning btn-lg fw-bold shadow">
+          <i class="bi bi-cart-plus me-1"></i> Start New Sale (POS)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Cashier Metrics -->
+  <div class="row g-3">
+    <div class="col-12 col-sm-6">
+      <div class="stat-card border-start border-4 border-teal">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="stat-label">Your Bills Today</div>
+            <div class="stat-value mt-1">{{ bills_count }}</div>
+            <div class="small text-muted mt-1">Total completed transactions</div>
+          </div>
+          <div class="stat-icon bg-teal-subtle text-teal">
+            <i class="bi bi-receipt"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6">
+      <div class="stat-card border-start border-4 border-primary">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="stat-label">Your Sales Volume</div>
+            <div class="stat-value mt-1 text-primary">{{ total_sales | inr }}</div>
+            <div class="small text-muted mt-1">Total revenue collected today</div>
+          </div>
+          <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+            <i class="bi bi-cash"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Recent Sales Table -->
+  <div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span class="fw-semibold"><i class="bi bi-clock-history me-2 text-teal"></i> Your Recent Sales (Today)</span>
+      <a href="{{ url_for('sales.list_sales') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Invoice No</th>
+            <th>Time</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Payment</th>
+            <th class="text-end">Total</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if recent_sales %}
+            {% for s in recent_sales %}
+            <tr>
+              <td><span class="fw-bold text-dark font-monospace">{{ s.invoice_no }}</span></td>
+              <td class="text-muted">{{ s.sale_date | datetime('%I:%M %p') }}</td>
+              <td>{{ s.customer_name or 'Walk-in Customer' }}</td>
+              <td><span class="badge bg-light text-dark border">{{ s.items_count }} items</span></td>
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary">{{ s.payment_mode }}</span>
+              </td>
+              <td class="text-end fw-bold text-teal">{{ s.total_amount | inr }}</td>
+              <td class="text-center">
+                <a href="{{ url_for('sales.view_receipt', sale_id=s.sale_id) }}" class="btn btn-sm btn-outline-teal" title="View / Print Receipt">
+                  <i class="bi bi-printer"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-cart-x fs-3 d-block mb-2 text-secondary"></i>
+                No sales recorded by you yet today. Click "Start New Sale" to begin.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

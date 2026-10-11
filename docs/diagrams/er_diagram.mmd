@@ -1,0 +1,85 @@
+erDiagram
+  USERS ||--o{ SALES : records
+  USERS ||--o{ EXPENSES : logs
+  USERS ||--o{ STOCK_MOVEMENTS : performs
+  CATEGORIES ||--o{ PRODUCTS : groups
+  SALES ||--|{ SALE_ITEMS : contains
+  PRODUCTS ||--o{ SALE_ITEMS : sold_in
+  PRODUCTS ||--o{ STOCK_MOVEMENTS : tracked_by
+
+  USERS {
+    int user_id PK
+    string name
+    string email UK
+    string password_hash
+    string role
+    tinyint is_active
+    datetime created_at
+  }
+
+  CATEGORIES {
+    int category_id PK
+    string name UK
+  }
+
+  PRODUCTS {
+    int product_id PK
+    string sku UK
+    string name
+    int category_id FK
+    decimal cost_price
+    decimal sell_price
+    int stock_qty
+    int reorder_level
+    tinyint is_active
+    datetime created_at
+  }
+
+  SALES {
+    int sale_id PK
+    string invoice_no UK
+    datetime sale_date
+    string customer_name
+    string customer_phone
+    decimal subtotal
+    decimal discount
+    decimal total_amount
+    string payment_mode
+    string status
+    int user_id FK
+  }
+
+  SALE_ITEMS {
+    int item_id PK
+    int sale_id FK
+    int product_id FK
+    int quantity
+    decimal unit_price
+    decimal unit_cost
+    decimal line_total
+  }
+
+  EXPENSES {
+    int expense_id PK
+    date expense_date
+    string category
+    decimal amount
+    string payment_mode
+    string note
+    int user_id FK
+  }
+
+  STOCK_MOVEMENTS {
+    int movement_id PK
+    int product_id FK
+    int change_qty
+    string reason
+    int ref_sale_id
+    int user_id FK
+    datetime created_at
+  }
+
+  SETTINGS {
+    string setting_key PK
+    string setting_value
+  }

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses Management — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-3">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">Store Operating Expenses</h2>
+      <p class="text-muted small m-0 mt-1">Track overhead expenses (Rent, Salaries, Electricity, Transport) for Net Profit accounting.</p>
+    </div>
+    <a href="{{ url_for('expenses.new_expense') }}" class="btn btn-teal text-white fw-semibold shadow-sm" style="background-color: #0F766E;">
+      <i class="bi bi-plus-circle me-1"></i> Add Expense
+    </a>
+  </div>
+
+  <!-- Filter & Summary Row -->
+  <div class="row g-3">
+    <!-- Filter Card -->
+    <div class="col-12 col-md-9">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body p-3">
+          <form method="GET" action="{{ url_for('expenses.list_expenses') }}" class="row g-2 align-items-center">
+            <div class="col-12 col-md-4">
+              <label class="small text-muted fw-semibold">Category</label>
+              <select class="form-select form-select-sm" name="category">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                  <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="small text-muted fw-semibold">From Date</label>
+              <input type="date" class="form-control form-control-sm" name="start_date" value="{{ start_date }}">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="small text-muted fw-semibold">To Date</label>
+              <input type="date" class="form-control form-control-sm" name="end_date" value="{{ end_date }}">
+            </div>
+            <div class="col-12 col-md-2 d-flex align-items-end gap-1">
+              <button type="submit" class="btn btn-secondary btn-sm flex-grow-1"><i class="bi bi-funnel me-1"></i> Filter</button>
+              {% if selected_category or start_date or end_date %}
+                <a href="{{ url_for('expenses.list_expenses') }}" class="btn btn-outline-secondary btn-sm" title="Reset">Reset</a>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Filtered Amount Card -->
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm border-0 border-start border-4 border-danger h-100 p-3 justify-content-center">
+        <div class="stat-label text-danger">Filtered Total</div>
+        <div class="stat-value text-danger mt-1 fs-4">{{ total_amount | inr }}</div>
+        <div class="small text-muted">Sum of displayed overheads</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expenses Table Card -->
+  <div class="card shadow-sm border-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Note / Description</th>
+            <th>Payment Mode</th>
+            <th>Recorded By</th>
+            <th class="text-end">Amount</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if expenses %}
+            {% for e in expenses %}
+            <tr>
+              <td class="small">{{ e.expense_date | date }}</td>
+              <td><span class="badge bg-light text-dark border">{{ e.category }}</span></td>
+              <td class="text-truncate" style="max-width: 250px;">{{ e.note or '-' }}</td>
+              <td><span class="badge bg-secondary-subtle text-secondary">{{ e.payment_mode }}</span></td>
+              <td class="small text-muted">{{ e.recorded_by }}</td>
+              <td class="text-end fw-bold text-danger">{{ e.amount | inr }}</td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('expenses.edit_expense', expense_id=e.expense_id) }}" class="btn btn-outline-secondary" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <form method="POST" action="{{ url_for('expenses.delete_expense', expense_id=e.expense_id) }}" onsubmit="return confirm('Delete this expense entry?');" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-danger" title="Delete">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-wallet2 fs-2 d-block mb-2 text-secondary"></i>
+                No expenses recorded for this selection.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center py-2">
+      <div class="small text-muted">Page {{ page }} of {{ total_pages }}</div>
+      <nav>
+        <ul class="pagination pagination-sm m-0">
+          <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('expenses.list_expenses', page=page-1, category=selected_category, start_date=start_date, end_date=end_date) }}">Prev</a>
+          </li>
+          <li class="page-item disabled"><span class="page-link">{{ page }}</span></li>
+          <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+            <a class="page-link" href="{{ url_for('expenses.list_expenses', page=page+1, category=selected_category, start_date=start_date, end_date=end_date) }}">Next</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+
+  </div>
+
+</div>
+{% endblock %}

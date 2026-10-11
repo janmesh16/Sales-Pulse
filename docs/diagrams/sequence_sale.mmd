@@ -1,0 +1,33 @@
+sequenceDiagram
+  actor C as Cashier
+  participant B as Browser (billing.js)
+  participant S as Flask Sales Blueprint
+  participant SV as SalesService
+  participant DB as MySQL Database
+
+  C->>B: Add products to cart, enter discount, choose payment mode
+  C->>B: Click Complete & Print Receipt
+  B->>S: POST /sales/create (JSON payload + X-CSRFToken)
+  S->>SV: create_sale(cart, discount, payment_mode, customer, user_id)
+  SV->>DB: START TRANSACTION
+  loop For each cart item
+    SV->>DB: SELECT sell_price, cost_price, stock_qty FROM products WHERE product_id=? FOR UPDATE
+    DB-->>SV: Product record (locked)
+  end
+  alt Stock Sufficient & Discount Valid
+    SV->>DB: INSERT INTO sales (...)
+    SV->>DB: INSERT INTO sale_items (snapshot unit_price & unit_cost)
+    SV->>DB: UPDATE products SET stock_qty = stock_qty - qty
+    SV->>DB: INSERT INTO stock_movements (reason='SALE')
+    SV->>DB: COMMIT TRANSACTION
+    SV-->>S: {sale_id, invoice_no}
+    S-->>B: 200 JSON {success: true, redirect_url: /sales/ID/receipt}
+    B->>S: GET /sales/ID/receipt
+    S-->>B: Render receipt.html
+    B-->>C: Display printable invoice receipt
+  else Insufficient Stock or Error
+    SV->>DB: ROLLBACK TRANSACTION
+    SV-->>S: Raise ValueError
+    S-->>B: 400 JSON {success: false, error: msg}
+    B-->>C: Display error banner
+  end

@@ -1,0 +1,34 @@
+sequenceDiagram
+  actor O as Store Owner
+  participant B as Browser (charts.js)
+  participant D as Flask Dashboard Blueprint
+  participant A as AnalyticsService
+  participant DB as MySQL Database
+
+  O->>B: Navigate to /dashboard
+  B->>D: GET /dashboard
+  D->>A: get_kpis()
+  A->>DB: Aggregation queries on sales, sale_items & expenses
+  DB-->>A: Summary sums & counts
+  A-->>D: kpi_data dictionary
+  D-->>B: Render dashboard.html (cards + empty canvas containers)
+  par Load Chart Visualizations
+    B->>D: GET /api/chart/sales-trend
+    D->>DB: 30-day daily sales query
+    DB-->>D: Rows
+    D-->>B: JSON trend data
+    B->>B: Render Chart 1 (Line)
+  and Top Products
+    B->>D: GET /api/chart/top-products
+    D->>DB: Grouped sum on sale_items
+    DB-->>D: Rows
+    D-->>B: JSON top products
+    B->>B: Render Chart 2 (Bar)
+  and Forecast
+    B->>D: GET /api/chart/forecast
+    D->>DB: 28-day historical revenue
+    DB-->>D: Daily revenue array
+    D-->>B: JSON SMA + seasonality projection
+    B->>B: Render Chart 6 (Dotted Line)
+  end
+  B-->>O: Interactive dashboard rendered

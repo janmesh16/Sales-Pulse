@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Import Products — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold m-0 text-dark">Bulk Import Products</h3>
+        <p class="text-muted small m-0 mt-1">Upload a CSV spreadsheet to import multiple products and inventory stock.</p>
+      </div>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Products
+      </a>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label for="csv_file" class="form-label fw-semibold text-secondary">Select CSV File</label>
+            <input class="form-control" type="file" id="csv_file" name="csv_file" accept=".csv" required>
+            <div class="form-text small">Maximum file size: 2MB. Format must be UTF-8 encoded CSV.</div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-teal text-white fw-semibold" style="background-color: #0F766E;">
+              <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Import Products
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CSV Format Instructions Card -->
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-light">
+        <span class="fw-semibold small text-uppercase text-secondary"><i class="bi bi-info-circle me-1"></i> Required CSV Format & Columns</span>
+      </div>
+      <div class="card-body p-3 small text-secondary">
+        <p class="mb-2">Your CSV file must include the following header row in exact sequence:</p>
+        <pre class="bg-dark text-light p-3 rounded-3 mb-3"><code>name,sku,category,cost_price,sell_price,stock_qty,reorder_level</code></pre>
+        <p class="mb-1"><strong>Example Row:</strong></p>
+        <pre class="bg-light border p-2 rounded-2 mb-3"><code>Tata Tea Gold 250g,BEV-TEA-001,Beverages,110.00,140.00,25,5</code></pre>
+        <ul class="mb-0 ps-3">
+          <li><strong>name:</strong> Product descriptive name.</li>
+          <li><strong>sku:</strong> Unique Stock Keeping Unit code (e.g. GRO-ATT-001).</li>
+          <li><strong>category:</strong> Category name (automatically created if not existing).</li>
+          <li><strong>cost_price & sell_price:</strong> Numbers with up to 2 decimal places.</li>
+          <li><strong>stock_qty & reorder_level:</strong> Positive whole numbers.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

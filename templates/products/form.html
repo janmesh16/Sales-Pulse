@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Edit Product — SalesPulse{% else %}Add Product — SalesPulse{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold m-0 text-dark">{% if is_edit %}Edit Product{% else %}Add New Product{% endif %}</h3>
+        <p class="text-muted small m-0 mt-1">Fill in the product details, costs, and inventory thresholds.</p>
+      </div>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Back to Products
+      </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <form method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="row g-3">
+            <!-- Product Name -->
+            <div class="col-12 col-md-8">
+              <label for="name" class="form-label fw-semibold small text-secondary">Product Name *</label>
+              <input type="text" class="form-control" id="name" name="name" value="{{ product.name or '' }}" placeholder="e.g. Aashirvaad Atta 5kg" required>
+            </div>
+
+            <!-- SKU -->
+            <div class="col-12 col-md-4">
+              <label for="sku" class="form-label fw-semibold small text-secondary">SKU Code *</label>
+              <input type="text" class="form-control text-uppercase" id="sku" name="sku" value="{{ product.sku or '' }}" placeholder="e.g. GRO-ATT-001" required>
+            </div>
+
+            <!-- Category -->
+            <div class="col-12 col-md-6">
+              <label for="category_id" class="form-label fw-semibold small text-secondary">Category *</label>
+              <select class="form-select" id="category_id" name="category_id" required>
+                <option value="">Select Category</option>
+                {% for cat in categories %}
+                  <option value="{{ cat.category_id }}" {% if product.category_id|string == cat.category_id|string %}selected{% endif %}>
+                    {{ cat.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Initial Stock Quantity -->
+            <div class="col-12 col-md-3">
+              <label for="stock_qty" class="form-label fw-semibold small text-secondary">Stock Quantity *</label>
+              <input type="number" class="form-control" id="stock_qty" name="stock_qty" value="{{ product.stock_qty if product.stock_qty is not none else '0' }}" min="0" required>
+            </div>
+
+            <!-- Reorder Level -->
+            <div class="col-12 col-md-3">
+              <label for="reorder_level" class="form-label fw-semibold small text-secondary">Reorder Alert Level</label>
+              <input type="number" class="form-control" id="reorder_level" name="reorder_level" value="{{ product.reorder_level or 5 }}" min="0" required>
+            </div>
+
+            <!-- Cost Price -->
+            <div class="col-12 col-md-6">
+              <label for="cost_price" class="form-label fw-semibold small text-secondary">Cost Price (₹) *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">₹</span>
+                <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" value="{{ product.cost_price or '' }}" placeholder="0.00" min="0" required>
+              </div>
+              <div class="form-text small">Price paid to supplier / distributor.</div>
+            </div>
+
+            <!-- Selling Price -->
+            <div class="col-12 col-md-6">
+              <label for="sell_price" class="form-label fw-semibold small text-secondary">Selling Price (₹) *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light">₹</span>
+                <input type="number" step="0.01" class="form-control" id="sell_price" name="sell_price" value="{{ product.sell_price or '' }}" placeholder="0.00" min="0" required>
+              </div>
+              <div class="form-text small">Price charged to customer on bills.</div>
+            </div>
+
+          </div>
+
+          <hr class="my-4">
+
+          <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('products.list_products') }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-teal text-white fw-semibold" style="background-color: #0F766E;">
+              <i class="bi bi-check-lg me-1"></i> {% if is_edit %}Update Product{% else %}Save Product{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

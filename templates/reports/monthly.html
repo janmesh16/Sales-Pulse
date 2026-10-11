@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Financial Report — SalesPulse{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column gap-3">
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+    <div>
+      <h2 class="fw-bold tracking-tight text-dark m-0">Monthly Performance & Profit Report</h2>
+      <p class="text-muted small m-0 mt-1">Calendar-month financial summary, day-by-day revenue, top products, and MoM trend.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('reports.monthly_report', year=year, month=month, export='csv') }}" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+        <i class="bi bi-file-earmark-spreadsheet me-1 text-success"></i> Export CSV
+      </a>
+      <a href="{{ url_for('reports.monthly_report', year=year, month=month, export='pdf') }}" class="btn btn-outline-secondary btn-sm bg-white shadow-sm">
+        <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs border-bottom mb-2">
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.daily_report') }}"><i class="bi bi-calendar-day me-1"></i> Daily Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active fw-semibold text-teal" href="{{ url_for('reports.monthly_report') }}"><i class="bi bi-calendar-month me-1"></i> Monthly Report</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.custom_range_report') }}"><i class="bi bi-calendar-range me-1"></i> Custom Range</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-secondary" href="{{ url_for('reports.product_performance') }}"><i class="bi bi-award me-1"></i> Product Performance</a>
+    </li>
+  </ul>
+
+  <!-- Month & Year Selector Form -->
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-3">
+      <form method="GET" action="{{ url_for('reports.monthly_report') }}" class="row g-2 align-items-center">
+        <div class="col-6 col-md-3">
+          <label class="small text-muted fw-semibold">Month</label>
+          <select class="form-select form-select-sm" name="month" onchange="this.form.submit()">
+            {% for m in range(1, 13) %}
+              <option value="{{ m }}" {% if month == m %}selected{% endif %}>Month {{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-md-3">
+          <label class="small text-muted fw-semibold">Year</label>
+          <select class="form-select form-select-sm" name="year" onchange="this.form.submit()">
+            {% for y in range(2024, 2028) %}
+              <option value="{{ y }}" {% if year == y %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 col-md-3 d-flex align-items-end">
+          <button type="submit" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-clockwise me-1"></i> Refresh</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Monthly KPI Row -->
+  <div class="row g-3">
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-teal">
+        <div class="stat-label">Monthly Revenue</div>
+        <div class="stat-value text-teal mt-1">{{ report.revenue | inr }}</div>
+        <div class="small text-muted">{{ report.bills }} customer bills</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-secondary">
+        <div class="stat-label">Gross Profit</div>
+        <div class="stat-value text-secondary mt-1">{{ report.gross_profit | inr }}</div>
+        <div class="small text-muted">COGS: {{ report.cogs | inr }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-danger">
+        <div class="stat-label">Total Overheads</div>
+        <div class="stat-value text-danger mt-1">{{ report.expenses | inr }}</div>
+        <div class="small text-muted">Operating expenses</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card border-start border-4 border-success">
+        <div class="stat-label">Net Profit</div>
+        <div class="stat-value mt-1 {% if report.net_profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+          {{ report.net_profit | inr }}
+        </div>
+        <div class="small text-muted">
+          Margin: <strong>{{ report.margin_pct }}%</strong> | MoM: 
+          {% if report.mom_change >= 0 %}+{% endif %}{{ report.mom_change }}%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Breakdown Table -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-semibold">
+      <i class="bi bi-table me-1 text-teal"></i> Daily Breakdown Table ({{ month }}/{{ year }})
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="text-center">Bills</th>
+            <th class="text-end">Revenue</th>
+            <th class="text-end">COGS</th>
+            <th class="text-end">Gross Profit</th>
+            <th class="text-center">View Day</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if report.daily_breakdown %}
+            {% for d in report.daily_breakdown %}
+            <tr>
+              <td class="fw-semibold">{{ d.d | date }}</td>
+              <td class="text-center">{{ d.bills }}</td>
+              <td class="text-end fw-semibold text-teal">{{ d.revenue | inr }}</td>
+              <td class="text-end text-muted">{{ d.cogs | inr }}</td>
+              <td class="text-end fw-bold text-success">{{ d.gross_profit | inr }}</td>
+              <td class="text-center">
+                <a href="{{ url_for('reports.daily_report', date=d.d) }}" class="btn btn-sm btn-outline-secondary py-0">
+                  Daily View
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No sales recorded for this month.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Top 10 Products This Month -->
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-semibold">
+      <i class="bi bi-trophy me-1 text-warning"></i> Top 10 Products by Revenue
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle m-0">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Product Name</th>
+            <th>SKU</th>
+            <th class="text-center">Units Sold</th>
+            <th class="text-end">Total Revenue</th>
+            <th class="text-end">Gross Profit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in report.top_products %}
+          <tr>
+            <td><span class="badge bg-light text-dark border">{{ loop.index }}</span></td>
+            <td class="fw-semibold text-dark">{{ p.name }}</td>
+            <td><span class="font-monospace small text-secondary">{{ p.sku }}</span></td>
+            <td class="text-center fw-bold">{{ p.qty }}</td>
+            <td class="text-end fw-semibold text-teal">{{ p.revenue | inr }}</td>
+            <td class="text-end fw-bold text-success">{{ p.profit | inr }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center py-3 text-muted">No products sold in this period.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
