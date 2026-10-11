@@ -231,4 +231,5 @@ def get_sale_details(sale_id):
     )
 
     sale["items"] = items
+    sale["line_items"] = items
     return sale

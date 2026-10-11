@@ -64,7 +64,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in sale.items %}
+          {% for item in sale.line_items or sale['items'] %}
           <tr>
             <td>
               <div class="fw-semibold">{{ item.product_name }}</div>
