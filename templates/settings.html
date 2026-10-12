@@ -18,6 +18,11 @@
           <input type="hidden" name="action" value="update_profile">
 
           <div class="mb-3">
+            <label for="owner_name" class="form-label small fw-semibold text-secondary">Owner / Manager Full Name *</label>
+            <input type="text" class="form-control" id="owner_name" name="owner_name" value="{{ current_user.name or 'Misbah Khan' }}" required>
+          </div>
+
+          <div class="mb-3">
             <label for="shop_name" class="form-label small fw-semibold text-secondary">Shop / Store Name *</label>
             <input type="text" class="form-control" id="shop_name" name="shop_name" value="{{ settings.shop_name or 'SalesPulse Retail' }}" required>
           </div>

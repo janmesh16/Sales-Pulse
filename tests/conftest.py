@@ -27,7 +27,7 @@ def owner_client(app, client):
     """A test client authenticated as the Store Owner."""
     with client.session_transaction() as sess:
         sess["user_id"] = 1
-        sess["user_name"] = "Anand Verma (Owner)"
+        sess["user_name"] = "Misbah Khan"
         sess["user_email"] = "owner@salespulse.com"
         sess["role"] = "OWNER"
     return client

@@ -3,7 +3,7 @@ User and Staff Management Blueprint for SalesPulse (Owner only).
 Allows adding and managing staff accounts and deactivating login access.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash
 from utils.decorators import owner_required
 from utils.validators import is_valid_email
@@ -80,3 +80,51 @@ def toggle_user(user_id):
     action_text = "activated" if new_status else "deactivated"
     flash(f"User '{user['name']}' has been {action_text}.", "info")
     return redirect(url_for("users.list_users"))
+
+
+@users_bp.route("/<int:user_id>/edit", methods=["GET", "POST"])
+@owner_required
+def edit_user(user_id):
+    """Edit user details (name, email, and optionally password)."""
+    user = query_one("SELECT user_id, name, email, role, is_active FROM users WHERE user_id = %s", (user_id,))
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for("users.list_users"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "").strip()
+
+        if not name or not email:
+            flash("Name and email are required.", "danger")
+            return render_template("users/edit.html", user=user)
+
+        if not is_valid_email(email):
+            flash("Please enter a valid email address.", "danger")
+            return render_template("users/edit.html", user=user)
+
+        existing = query_one("SELECT user_id FROM users WHERE email = %s AND user_id != %s", (email, user_id))
+        if existing:
+            flash(f"A user with email '{email}' already exists.", "danger")
+            return render_template("users/edit.html", user=user)
+
+        if password:
+            if len(password) < 6:
+                flash("Password must be at least 6 characters long.", "danger")
+                return render_template("users/edit.html", user=user)
+            execute_db(
+                "UPDATE users SET name = %s, email = %s, password_hash = %s WHERE user_id = %s",
+                (name, email, generate_password_hash(password), user_id)
+            )
+        else:
+            execute_db("UPDATE users SET name = %s, email = %s WHERE user_id = %s", (name, email, user_id))
+
+        if session.get("user_id") == user_id:
+            session["user_name"] = name
+            session["user_email"] = email
+
+        flash(f"User account '{name}' updated successfully!", "success")
+        return redirect(url_for("users.list_users"))
+
+    return render_template("users/edit.html", user=user)

@@ -51,6 +51,9 @@
             </td>
             <td class="small text-muted">{{ u.created_at | date }}</td>
             <td class="text-center">
+              <a href="{{ url_for('users.edit_user', user_id=u.user_id) }}" class="btn btn-sm btn-outline-secondary me-1">
+                <i class="bi bi-pencil me-1"></i>Edit
+              </a>
               {% if u.role != 'OWNER' %}
               <form method="POST" action="{{ url_for('users.toggle_user', user_id=u.user_id) }}" onsubmit="return confirm('Toggle active status for this user?');" class="d-inline">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -59,7 +62,7 @@
                 </button>
               </form>
               {% else %}
-                <span class="text-muted small">Protected</span>
+                <span class="badge bg-light text-muted border">Protected</span>
               {% endif %}
             </td>
           </tr>

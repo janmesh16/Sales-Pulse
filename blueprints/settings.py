@@ -23,11 +23,16 @@ def settings_page():
         action = request.form.get("action")
 
         if action == "update_profile" and user_role == "OWNER":
+            owner_name = request.form.get("owner_name", "").strip()
             shop_name = request.form.get("shop_name", "").strip()
             shop_address = request.form.get("shop_address", "").strip()
             gstin = request.form.get("gstin", "").strip()
             currency = request.form.get("currency", "₹").strip()
             default_reorder = request.form.get("default_reorder_level", "5").strip()
+
+            if owner_name:
+                execute_db("UPDATE users SET name = %s WHERE user_id = %s", (owner_name, user_id))
+                session["user_name"] = owner_name
 
             settings_to_update = {
                 "shop_name": shop_name,
@@ -47,7 +52,7 @@ def settings_page():
                     (k, v)
                 )
 
-            flash("Shop details updated successfully!", "success")
+            flash("Store and owner profile details updated successfully!", "success")
             return redirect(url_for("settings.settings_page"))
 
         elif action == "change_password":

@@ -48,7 +48,7 @@ def seed_database(config_class=Config):
             INSERT INTO users (name, email, password_hash, role, is_active, created_at)
             VALUES (%s, %s, %s, 'OWNER', 1, NOW()), (%s, %s, %s, 'STAFF', 1, NOW())
             """,
-            ("Anand Verma (Owner)", "owner@salespulse.com", owner_hash,
+            ("Misbah Khan", "owner@salespulse.com", owner_hash,
              "Rohan Sharma (Cashier)", "staff@salespulse.com", staff_hash)
         )
         owner_id = 1

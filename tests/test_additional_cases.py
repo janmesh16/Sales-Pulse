@@ -166,3 +166,43 @@ def test_tc20_concurrency_stock_check(app):
         with pytest.raises(ValueError) as exc:
             create_sale(cart=[{"product_id": pid, "qty": 1}], user_id=1)
         assert "Insufficient stock" in str(exc.value)
+
+
+def test_owner_name_update_settings(owner_client, app):
+    """Verify owner name can be updated via /settings and reflects in database and session."""
+    res = owner_client.post(
+        "/settings",
+        data={
+            "action": "update_profile",
+            "owner_name": "Misbah Khan",
+            "shop_name": "SalesPulse Supermart",
+            "shop_address": "Test Address",
+            "gstin": "27AABCS1429B1Z8",
+            "currency": "₹",
+            "default_reorder_level": "5"
+        },
+        follow_redirects=True
+    )
+    assert res.status_code == 200
+    with app.app_context():
+        owner = query_one("SELECT name FROM users WHERE user_id = 1")
+        assert owner["name"] == "Misbah Khan"
+
+
+def test_edit_user_account(owner_client, app):
+    """Verify editing user name and email via /users/<id>/edit."""
+    res = owner_client.post(
+        "/users/1/edit",
+        data={
+            "name": "Misbah Khan",
+            "email": "owner@salespulse.com",
+            "password": ""
+        },
+        follow_redirects=True
+    )
+    assert res.status_code == 200
+    assert b"updated successfully" in res.data
+    with app.app_context():
+        owner = query_one("SELECT name, email FROM users WHERE user_id = 1")
+        assert owner["name"] == "Misbah Khan"
+

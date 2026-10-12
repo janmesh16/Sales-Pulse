@@ -25,6 +25,14 @@ def create_app(config_class=Config):
     # Register teardown function to close pooled DB connections
     app.teardown_appcontext(close_db)
 
+    # Ensure default owner name update if legacy 'Anand Verma' exists in DB
+    try:
+        from db import execute_db
+        with app.app_context():
+            execute_db("UPDATE users SET name = 'Misbah Khan' WHERE role = 'OWNER' AND name LIKE '%Anand Verma%'")
+    except Exception:
+        pass
+
     # Register Jinja2 template filters
     app.jinja_env.filters["inr"] = format_inr
     app.jinja_env.filters["date"] = format_date
@@ -36,6 +44,7 @@ def create_app(config_class=Config):
     def inject_global_vars():
         currency = "₹"
         shop_name = "SalesPulse Store"
+        user_name = session.get("user_name")
         try:
             curr_row = query_one("SELECT setting_value FROM settings WHERE setting_key = 'currency'")
             if curr_row:
@@ -43,13 +52,18 @@ def create_app(config_class=Config):
             shop_row = query_one("SELECT setting_value FROM settings WHERE setting_key = 'shop_name'")
             if shop_row:
                 shop_name = shop_row["setting_value"]
+            if session.get("user_id"):
+                u_row = query_one("SELECT name FROM users WHERE user_id = %s", (session.get("user_id"),))
+                if u_row:
+                    user_name = u_row["name"]
+                    session["user_name"] = user_name
         except Exception:
             pass
 
         return {
             "current_user": {
                 "id": session.get("user_id"),
-                "name": session.get("user_name"),
+                "name": user_name,
                 "email": session.get("user_email"),
                 "role": session.get("role")
             },
