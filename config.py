@@ -5,6 +5,7 @@ Loads environment variables from .env and exposes application configurations.
 
 import os
 from datetime import timedelta
+from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -15,14 +16,24 @@ class Config:
     """Base application configuration."""
     SECRET_KEY = os.getenv("SECRET_KEY", "salespulse-default-secret-key-change-in-prod")
 
-    # Database settings
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_PORT = int(os.getenv("DB_PORT", 3306))
-    DB_USER = os.getenv("DB_USER", "root")
-    DB_PASSWORD = os.getenv("DB_PASSWORD", "")
-    DB_NAME = os.getenv("DB_NAME", "salespulse")
+    # Database settings (support both full DATABASE_URL / Service URI and individual variables)
+    _db_url = os.getenv("DATABASE_URL") or os.getenv("MYSQL_URL")
+    if _db_url:
+        _parsed = urlparse(_db_url)
+        DB_HOST = _parsed.hostname or "localhost"
+        DB_PORT = int(_parsed.port or 3306)
+        DB_USER = _parsed.username or "root"
+        DB_PASSWORD = _parsed.password or ""
+        DB_NAME = _parsed.path.lstrip("/") if _parsed.path else "salespulse"
+    else:
+        DB_HOST = os.getenv("DB_HOST", "localhost")
+        DB_PORT = int(os.getenv("DB_PORT", 3306))
+        DB_USER = os.getenv("DB_USER", "root")
+        DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+        DB_NAME = os.getenv("DB_NAME", "salespulse")
+
     DB_POOL_NAME = "salespulse_pool"
-    DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", 10))
+    DB_POOL_SIZE = int(os.getenv("DB_POOL_SIZE", 5))
 
     # Security & Session
     SESSION_COOKIE_HTTPONLY = True
