@@ -4,7 +4,7 @@ Renders Owner Dashboard (KPIs, Charts) and Staff Home (Daily cashier summary).
 Exposes JSON endpoints for Chart.js client-side rendering.
 """
 
-from flask import Blueprint, render_template, session, jsonify, request
+from flask import Blueprint, render_template, session, jsonify, request, redirect, url_for
 from utils.decorators import login_required, owner_required
 from services.analytics_service import (
     get_kpis, get_daily_sales_trend, get_top_products,
@@ -21,12 +21,8 @@ dashboard_bp = Blueprint("dashboard", __name__)
 def index():
     """Root redirect depending on user login state."""
     if "user_id" in session:
-        return (
-            render_template("dashboard.html", kpis=get_kpis())
-            if session.get("role") == "OWNER"
-            else render_template("staff_home.html")
-        )
-    return render_template("login.html")
+        return redirect(url_for("dashboard.owner_dashboard" if session.get("role") == "OWNER" else "dashboard.staff_home"))
+    return redirect(url_for("auth.login"))
 
 
 @dashboard_bp.route("/dashboard")

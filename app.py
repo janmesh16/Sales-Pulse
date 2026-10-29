@@ -4,8 +4,9 @@ Initializes Flask, sets up CSRF protection, registers Blueprints,
 configures security headers, Jinja filters, and error handlers.
 """
 
-from flask import Flask, render_template, session, g
-from flask_wtf.csrf import CSRFProtect
+from flask import Flask, render_template, session, g, request, jsonify, flash, redirect, url_for
+from flask_wtf.csrf import CSRFProtect, CSRFError
+from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 from db import init_db_pool, close_db, query_one
 from utils.formatters import format_inr, format_date, format_datetime, format_percent
@@ -17,6 +18,10 @@ def create_app(config_class=Config):
     """Factory function to build and configure the Flask application instance."""
     app = Flask(__name__)
     app.config.from_object(config_class)
+
+    # Configure ProxyFix for reverse proxy deployments (Render, Railway, Heroku, Nginx)
+    # Correctly handles X-Forwarded-Proto, X-Forwarded-For, X-Forwarded-Host
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     # Initialize connection pooling and CSRF
     init_db_pool(app.config)
@@ -91,6 +96,14 @@ def create_app(config_class=Config):
         return response
 
     # Error handlers
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        """Handle CSRF errors gracefully instead of showing raw 400 Bad Request."""
+        if request.is_json or request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"success": False, "error": "CSRF session expired or invalid. Please refresh the page."}), 400
+        flash("Your session expired or cookies were refreshed. Please log in again.", "warning")
+        return redirect(url_for("auth.login"))
+
     @app.errorhandler(403)
     def forbidden(e):
         return render_template("errors/403.html"), 403
