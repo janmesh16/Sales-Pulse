@@ -166,6 +166,11 @@ def init_db_pool(app_config=None):
     except (ValueError, TypeError):
         db_port = 3306
 
+    # Auto-correct Aiven MySQL port if user mistakenly set Render's web port (10000) or default (3306)
+    if "aivencloud.com" in str(db_host) and db_port in (3306, 10000):
+        print(f"Auto-correcting Aiven MySQL port from {db_port} to 13162.")
+        db_port = 13162
+
     try:
         _pool = pooling.MySQLConnectionPool(
             pool_name=pool_name,

@@ -24,7 +24,10 @@ def create_app(config_class=Config):
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     # Initialize connection pooling and CSRF
-    init_db_pool(app.config)
+    try:
+        init_db_pool(app.config)
+    except Exception as e:
+        print(f"Notice: Initial DB pool connection delayed ({e}). Will connect on first request.")
     csrf.init_app(app)
 
     # Register teardown function to close pooled DB connections

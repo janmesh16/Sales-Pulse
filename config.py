@@ -27,7 +27,13 @@ class Config:
         DB_NAME = _parsed.path.lstrip("/") if _parsed.path else "salespulse"
     else:
         DB_HOST = os.getenv("DB_HOST", "localhost")
-        DB_PORT = int(os.getenv("DB_PORT", 3306))
+        try:
+            DB_PORT = int(os.getenv("DB_PORT", 3306))
+        except (ValueError, TypeError):
+            DB_PORT = 3306
+        if "aivencloud.com" in DB_HOST and DB_PORT in (3306, 10000):
+            DB_PORT = 13162
+
         DB_USER = os.getenv("DB_USER", "root")
         DB_PASSWORD = os.getenv("DB_PASSWORD", "")
         DB_NAME = os.getenv("DB_NAME", "salespulse")
