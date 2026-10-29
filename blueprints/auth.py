@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
 from db import query_one
+from app import csrf
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -16,6 +17,7 @@ _failed_attempts = {}
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@csrf.exempt
 def login():
     """User login with rate limiting and role-based redirection."""
     if "user_id" in session:

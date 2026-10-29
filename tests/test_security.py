@@ -84,6 +84,6 @@ def test_tc41_csrf_protection_enforced():
     app = create_app(CsrfTestConfig)
     test_client = app.test_client()
 
-    # Attempt POST without CSRF token - intercepted by CSRF protection (redirected to login or 400)
-    res = test_client.post("/login", data={"email": "owner@salespulse.com", "password": "Owner@123"})
-    assert res.status_code in (302, 400)
+    # Attempt POST to protected route without CSRF token - intercepted by CSRF protection
+    res = test_client.post("/sales/create", json={"cart": []})
+    assert res.status_code == 400
